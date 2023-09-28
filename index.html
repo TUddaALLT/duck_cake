@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Management</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #007bff;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      table,
+      th,
+      td {
+        text-align: center;
+        border: 1px solid #ddd;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        text-align: center;
+      }
+
+      th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+
+      .btn-container {
+        text-align: right;
+        margin-bottom: 10px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+
+      .btn:hover {
+        background-color: #0056b3;
+      }
+
+      .form-container {
+        display: none;
+        margin-top: 20px;
+      }
+
+      .form-container input[type="text"],
+      .form-container input[type="tel"],
+      .form-container input[type="email"],
+      .form-container input[type="date"],
+      .form-container input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        outline: none;
+      }
+
+      .form-container input[type="text"]:focus,
+      .form-container input[type="tel"]:focus,
+      .form-container input[type="email"]:focus,
+      .form-container input[type="date"]:focus,
+      .form-container input[type="number"]:focus {
+        border-color: #007bff;
+      }
+
+      .form-container button[type="submit"],
+      .form-container button[type="button"] {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+
+      .form-container button[type="submit"]:hover,
+      .form-container button[type="button"]:hover {
+        background-color: #0056b3;
+      }
+
+      .form-container h2 {
+        color: #007bff;
+      }
+
+      /* Style the edit and delete buttons */
+      .edit-btn,
+      .delete-btn {
+        padding: 6px 12px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-right: 5px;
+      }
+
+      .edit-btn:hover,
+      .delete-btn:hover {
+        background-color: #0056b3;
+      }
+
+      /* Style the cancel button in edit mode */
+      #cancel-edit {
+        background-color: #ccc;
+        color: #fff;
+      }
+
+      #cancel-edit:hover {
+        background-color: #aaa;
+      }
+      .action {
+        display: flex;
+      }
+      footer {
+        text-align: center;
+        color: #1eb42d;
+        padding: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Customer Management</h1>
+      <div class="btn-container">
+        <button id="show-add-form" class="btn">Add Customer</button>
+      </div>
+      <div class="form-container" id="add-form">
+        <h2>Add Customer</h2>
+        <form id="customer-form">
+          <input type="text" placeholder="Name" id="name" required />
+          <input type="tel" placeholder="Phone" id="phone" required />
+          <input type="text" placeholder="Address" id="address" required />
+          <input type="email" placeholder="Email" id="email" required />
+          <input type="date" placeholder="Start Date" id="startDate" required />
+          <input
+            type="number"
+            placeholder="Number of Stars"
+            id="numberOfStar"
+            required
+          />
+          <button type="submit" class="btn">Save</button>
+          <button type="button" id="cancel-add" class="btn">Cancel</button>
+        </form>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Address</th>
+            <th>Email</th>
+            <th>Start Date</th>
+            <th>Number of Stars</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="customer-list">
+          <!-- Customer data will be displayed here -->
+        </tbody>
+      </table>
+      <div class="form-container" id="edit-form" style="display: none">
+        <h2>Edit Customer</h2>
+        <form id="edit-customer-form">
+          <input type="hidden" id="edit-customer-id" />
+          <input type="text" placeholder="Name" id="edit-name" required />
+          <input type="tel" placeholder="Phone" id="edit-phone" required />
+          <input type="text" placeholder="Address" id="edit-address" required />
+          <input type="email" placeholder="Email" id="edit-email" required />
+          <input
+            type="date"
+            placeholder="Start Date"
+            id="edit-startDate"
+            required
+          />
+          <input
+            type="number"
+            placeholder="Number of Stars"
+            id="edit-numberOfStar"
+            required
+          />
+          <button type="submit" class="btn">Update</button>
+          <button type="button" id="cancel-edit" class="btn">Cancel</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const customerList = document.getElementById("customer-list");
+      const addForm = document.getElementById("add-form");
+      const customerForm = document.getElementById("customer-form");
+      const showAddFormButton = document.getElementById("show-add-form");
+      const cancelAddButton = document.getElementById("cancel-add");
+      const apiUrl = "https://exe101.onrender.com/users"; // Replace with your JSON server URL
+
+      // Function to fetch and display customers
+      function displayCustomers() {
+        fetch(apiUrl)
+          .then((response) => response.json())
+          .then((customers) => {
+            customerList.innerHTML = "";
+            customers.forEach((customer) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                            <td>${customer.id}</td>
+                            <td>${customer.name}</td>
+                            <td>${customer.phone}</td>
+                            <td>${customer.address}</td>
+                            <td>${customer.email}</td>
+                            <td>${customer.startDate}</td>
+                            <td>${customer.numberOfStar}</td>
+                            <td class="action">
+                                <button class="edit-btn" data-id="${customer.id}">Edit</button>
+                                <button class="delete-btn" data-id="${customer.id}">Delete</button>
+                            </td>
+                        `;
+              customerList.appendChild(row);
+            });
+          });
+      }
+
+      // Show the add customer form when the "Add Customer" button is clicked
+      showAddFormButton.addEventListener("click", () => {
+        addForm.style.display = "block";
+      });
+
+      // Hide the add customer form when the "Cancel" button is clicked
+      cancelAddButton.addEventListener("click", () => {
+        addForm.style.display = "none";
+      });
+
+      // Event listener for submitting the add customer form
+      customerForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const formData = new FormData(customerForm);
+        // Get the length of the customer list
+        const customerCount = customerList.getElementsByTagName("tr").length;
+        const customerData = {
+          id: customerCount + 1,
+          name: document.getElementById("name").value,
+          phone: document.getElementById("phone").value,
+          address: document.getElementById("address").value,
+          email: document.getElementById("email").value,
+          startDate: document.getElementById("startDate").value,
+          numberOfStar: document.getElementById("numberOfStar").value,
+        };
+
+        formData.forEach((value, key) => {
+          customerData[key] = value;
+        });
+
+        // Send a POST request to add the customer
+        fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(customerData),
+        }).then(() => {
+          displayCustomers();
+          addForm.style.display = "none";
+          customerForm.reset();
+        });
+      });
+
+      // Event delegation for Edit and Delete buttons
+      customerList.addEventListener("click", (event) => {
+        if (event.target.classList.contains("edit-btn")) {
+          const customerId = event.target.getAttribute("data-id");
+          // You can implement the edit functionality here
+          // For simplicity, you can display an alert or navigate to an edit page
+          alert(`Edit customer with ID ${customerId}`);
+        } else if (event.target.classList.contains("delete-btn")) {
+          const customerId = event.target.getAttribute("data-id");
+          if (confirm("Are you sure you want to delete this customer?")) {
+            // Send a DELETE request to remove the customer
+            fetch(`${apiUrl}/${customerId}`, {
+              method: "DELETE",
+            }).then(() => {
+              displayCustomers();
+            });
+          }
+        }
+      });
+      // Event listener for editing a customer
+      customerList.addEventListener("click", (event) => {
+        if (event.target.classList.contains("edit-btn")) {
+          const customerId = event.target.getAttribute("data-id");
+
+          // Fetch the customer data by ID
+          fetch(`${apiUrl}/${customerId}`)
+            .then((response) => response.json())
+            .then((customer) => {
+              // Populate the edit form with customer data
+              document.getElementById("edit-customer-id").value = customer.id;
+              document.getElementById("edit-name").value = customer.name;
+              document.getElementById("edit-phone").value = customer.phone;
+              document.getElementById("edit-address").value = customer.address;
+              document.getElementById("edit-email").value = customer.email;
+              document.getElementById("edit-startDate").value =
+                customer.startDate;
+              document.getElementById("edit-numberOfStar").value =
+                customer.numberOfStar;
+
+              // Show the edit form and hide the add form
+              addForm.style.display = "none";
+              document.getElementById("edit-form").style.display = "block";
+            });
+        }
+      });
+
+      // Event listener for submitting the edit customer form
+      document
+        .getElementById("edit-customer-form")
+        .addEventListener("submit", (e) => {
+          e.preventDefault();
+          const customerId = document.getElementById("edit-customer-id").value;
+
+          const customerData = {
+            name: document.getElementById("edit-name").value,
+            phone: document.getElementById("edit-phone").value,
+            address: document.getElementById("edit-address").value,
+            email: document.getElementById("edit-email").value,
+            startDate: document.getElementById("edit-startDate").value,
+            numberOfStar: document.getElementById("edit-numberOfStar").value,
+          };
+
+          // Send a PUT request to update the customer
+          fetch(`${apiUrl}/${customerId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(customerData),
+          }).then(() => {
+            displayCustomers();
+            document.getElementById("edit-form").style.display = "none";
+            document.getElementById("edit-customer-form").reset();
+          });
+        });
+
+      // Event listener for canceling the edit operation
+      document.getElementById("cancel-edit").addEventListener("click", () => {
+        document.getElementById("edit-form").style.display = "none";
+      });
+
+      // Initial display of customers
+      displayCustomers();
+    </script>
+  </body>
+  <footer>&copy; 2023 Genius Gen-z</footer>
+</html>
