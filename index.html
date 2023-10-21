@@ -234,14 +234,14 @@
       // Function to fetch and display customers
       function displayCustomers() {
         const url = window.location.href;
-        if (!url.includes("phone")) {
-          fetch(apiUrl)
-            .then((response) => response.json())
-            .then((customers) => {
-              customerList.innerHTML = "";
-              customers.forEach((customer) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
+
+        fetch(apiUrl)
+          .then((response) => response.json())
+          .then((customers) => {
+            customerList.innerHTML = "";
+            customers.forEach((customer) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
                             <td>${customer.id}</td>
                             <td>${customer.name}</td>
                             <td>${customer.phone}</td>
@@ -254,10 +254,9 @@
                                 <button class="delete-btn" data-id="${customer.id}">Delete</button>
                             </td>
                         `;
-                customerList.appendChild(row);
-              });
+              customerList.appendChild(row);
             });
-        }
+          });
       }
 
       // Show the add customer form when the "Add Customer" button is clicked
@@ -419,7 +418,7 @@
                 body: JSON.stringify(customerData),
               }).then(() => {
                 if (confirm(cust.name + " đã tích điểm thành công")) {
-                  window.location.href = "/successful.html";
+                  window.location.href = "successful.html";
                 } else {
                   window.close();
                 }
