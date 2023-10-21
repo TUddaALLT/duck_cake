@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="all">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,7 +13,7 @@
       }
 
       .container {
-        max-width: 1000px;
+        max-width: 1200px;
         margin: 20px auto;
         padding: 20px;
         background-color: #fff;
@@ -41,7 +41,8 @@
 
       th,
       td {
-        padding: 12px;
+        padding: 10px;
+        width: 200px;
         text-align: center;
       }
 
@@ -141,6 +142,7 @@
       }
       .action {
         display: flex;
+        justify-content: center;
       }
       footer {
         text-align: center;
@@ -154,6 +156,11 @@
       <h1>Customer Management</h1>
       <div class="btn-container">
         <button id="show-add-form" class="btn">Add Customer</button>
+        <button id="show-add-form" class="btn">
+          <a href="/qr.html" style="text-decoration: none; color: white">
+            Qr code for customer</a
+          >
+        </button>
       </div>
       <div class="form-container" id="add-form">
         <h2>Add Customer</h2>
@@ -226,13 +233,15 @@
 
       // Function to fetch and display customers
       function displayCustomers() {
-        fetch(apiUrl)
-          .then((response) => response.json())
-          .then((customers) => {
-            customerList.innerHTML = "";
-            customers.forEach((customer) => {
-              const row = document.createElement("tr");
-              row.innerHTML = `
+        const url = window.location.href;
+        if (!url.includes("phone")) {
+          fetch(apiUrl)
+            .then((response) => response.json())
+            .then((customers) => {
+              customerList.innerHTML = "";
+              customers.forEach((customer) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
                             <td>${customer.id}</td>
                             <td>${customer.name}</td>
                             <td>${customer.phone}</td>
@@ -245,9 +254,10 @@
                                 <button class="delete-btn" data-id="${customer.id}">Delete</button>
                             </td>
                         `;
-              customerList.appendChild(row);
+                customerList.appendChild(row);
+              });
             });
-          });
+        }
       }
 
       // Show the add customer form when the "Add Customer" button is clicked
@@ -377,6 +387,49 @@
 
       // Initial display of customers
       displayCustomers();
+
+      async function checkURLForPhoneParam() {
+        // Get the current URL
+        const url = window.location.href;
+
+        // Check if the URL contains a "phone" parameter
+        if (url.includes("phone")) {
+          document.querySelector(".all").innerHTML = "";
+          const phone = url.substring(url.indexOf("phone=") + 6);
+          var cust;
+          await fetch(apiUrl + "/?phone=" + phone)
+            .then((response) => response.json())
+            .then((customers) => {
+              console.log(customers[0]);
+
+              const customerData = {
+                name: customers[0].name,
+                phone: customers[0].phone,
+                address: customers[0].address,
+                email: customers[0].email,
+                startDate: customers[0].startDate,
+                numberOfStar: parseInt(customers[0].numberOfStar) + parseInt(1),
+              };
+              cust = customerData;
+              fetch(`${apiUrl}/${customers[0].id}`, {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(customerData),
+              }).then(() => {
+                if (confirm(cust.name + " đã tích điểm thành công")) {
+                  window.location.href = "/successful.html";
+                } else {
+                  window.close();
+                }
+              });
+            });
+        }
+      }
+
+      // Call the function to check the URL when the page loads
+      checkURLForPhoneParam();
     </script>
   </body>
   <footer>&copy; 2023 Genius Gen-z</footer>

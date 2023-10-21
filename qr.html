@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR Code Generator</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <p>Enter Phone</p>
+      <input type="text" placeholder="Text OR uRL" id="qrText" />
+      <div id="imageBox">
+        <img src="" id="qrImage" />
+      </div>
+      <button onclick="generator()">Generate Qr</button>
+    </div>
+    <script>
+      let imageBox = document.getElementById("imageBox");
+      let qrImage = document.getElementById("qrImage");
+      let qrText = document.getElementById("qrText");
+
+      function generator() {
+        qrImage.src =
+          "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" +
+          "https://tuddaallt.github.io/duck_cake/?phone=" +
+          qrText.value;
+      }
+    </script>
+  </body>
+</html>
